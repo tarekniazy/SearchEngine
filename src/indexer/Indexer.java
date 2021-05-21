@@ -10,7 +10,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
-import stemmer.*;
+
 
 
 import java.util.*;
@@ -18,6 +18,8 @@ import java.util.*;
 
 
 public class Indexer implements Runnable {
+
+   private static final double relavencyThreshold = 0.5;
     private Thread thread;
     private List<String> splitedList=new ArrayList<>();
     private List<String> relevantList=new ArrayList<>();
@@ -29,19 +31,20 @@ public class Indexer implements Runnable {
         thread =new Thread(this);
         thread.start();
 
-//        splitedList.add("Mapping.");
-//        splitedList.add("the.");
-//        splitedList.add("mapped");
-//        splitedList.add("a.");
+//        splitedList.add("java");
+//        splitedList.add("java");
+//        splitedList.add("java");
+//        splitedList.add("Java");
 //        splitedList.add("Java(");
 //        splitedList.add("(Threading");
-//        splitedList.add("Os");
+//        splitedList.add("Os(");
 //        splitedList.add("Os");
 //        splitedList.add("Lab");
 //        splitedList.add("Map");
 //        splitedList.add("Normal");
 //        splitedList.add("Threading");
 //        splitedList.add("Java");
+//        splitedList.add("java");
 //        splitedList.add("here");
 //        splitedList.add("don’t");
 //        splitedList.add("let’s");
@@ -51,12 +54,14 @@ public class Indexer implements Runnable {
     public static void main(String[] args)
     {
         Indexer indexer = new Indexer();
-        Document doc=indexer.requestDocument("https://www.geeksforgeeks.org/map-interface-java-examples/");  // https://www.javatpoint.com/multithreading-in-java
+        Document doc=indexer.requestDocument("https://en.wikipedia.org/wiki/Prison#:~:text=A%20prison%2C%20also%20known%20as,remand%20center%2C%20is%20a%20facility");  //
         indexer.parseDocument(doc);
         indexer.preProcessing();
         indexer.relevant();
 
-
+        //https://www.geeksforgeeks.org/map-interface-java-examples/
+        //https://www.netflix.com/eg-en/browse/genre/7424
+        //
 
 
         for (int i = 0; i < indexer.splitedList.size(); i++) {
@@ -84,7 +89,24 @@ public class Indexer implements Runnable {
 
         for(int i=0;i<splitedList.size();i++)
         {
-            if (splitedList.get(i).endsWith(".")||splitedList.get(i).endsWith("!")||splitedList.get(i).endsWith(",")||splitedList.get(i).endsWith(":")||splitedList.get(i).endsWith(";")||splitedList.get(i).endsWith("@")||splitedList.get(i).endsWith("#")||splitedList.get(i).endsWith("$")||splitedList.get(i).endsWith("%")||splitedList.get(i).endsWith("^")||splitedList.get(i).endsWith("&")||splitedList.get(i).endsWith("*")||splitedList.get(i).endsWith(")")||splitedList.get(i).endsWith("(")||splitedList.get(i).endsWith("}")||splitedList.get(i).endsWith("]")||splitedList.get(i).endsWith(">")||splitedList.get(i).endsWith("?")||splitedList.get(i).endsWith("'")||splitedList.get(i).endsWith("\""))
+            splitedList.get(i).trim().isEmpty();
+
+            if (splitedList.get(i).endsWith("()"))
+            {
+                StringBuilder sb = new StringBuilder(splitedList.get(i));
+
+                sb.deleteCharAt(splitedList.get(i).length() - 1);
+
+                splitedList.set(i,sb.toString());
+
+                StringBuilder sb2 = new StringBuilder(splitedList.get(i));
+
+                sb.deleteCharAt(splitedList.get(i).length() - 1);
+
+                splitedList.set(i,sb2.toString());
+            }
+
+                if (splitedList.get(i).endsWith(".")||splitedList.get(i).endsWith("!")||splitedList.get(i).endsWith(",")||splitedList.get(i).endsWith(":")||splitedList.get(i).endsWith(";")||splitedList.get(i).endsWith("@")||splitedList.get(i).endsWith("#")||splitedList.get(i).endsWith("$")||splitedList.get(i).endsWith("%")||splitedList.get(i).endsWith("^")||splitedList.get(i).endsWith("&")||splitedList.get(i).endsWith("*")||splitedList.get(i).endsWith(")")||splitedList.get(i).endsWith("(")||splitedList.get(i).endsWith("}")||splitedList.get(i).endsWith("]")||splitedList.get(i).endsWith(">")||splitedList.get(i).endsWith("?")||splitedList.get(i).endsWith("'")||splitedList.get(i).endsWith("\""))
             {
                 StringBuilder sb = new StringBuilder(splitedList.get(i));
 
@@ -121,11 +143,11 @@ public class Indexer implements Runnable {
 
        while(j<splitedList.size())
        {
-                System.out.println("\n j= " +j + "\n");
+//                System.out.println("\n j= " +j + "\n");
 
                removed=false;
 
-           System.out.println("\n size = " +splitedList.size() + "\n");
+//           System.out.println("\n size = " +splitedList.size() + "\n");
 
                 for (int i = 0; i < stopwords.length; i++) {
 
@@ -145,19 +167,11 @@ public class Indexer implements Runnable {
                     j++;
                 }
 
-                System.out.println("\n size = " +splitedList.size() + "\n");
+//                System.out.println("\n size = " +splitedList.size() + "\n");
 
        }
 
-        Stemmer s = new Stemmer();
-        for (int i=0;i<splitedList.size();i++)
-        {
-            for (int k=0;k<splitedList.get(i).length();k++) {
-                s.add(splitedList.get(i).charAt(k));
-            }
-            s.stem();
-            splitedList.set(i,s.toString());
-        }
+
 
     }
 
@@ -170,11 +184,15 @@ public class Indexer implements Runnable {
         List<String> elementList=new ArrayList<>();
         String[] temp;
 
+
          int j=1;
 
 
 
         if (doc!=null) {
+
+
+
             System.out.println("document is not empty \n");
 
                  Element body = doc.body();
@@ -195,10 +213,22 @@ public class Indexer implements Runnable {
             Elements paragraphs=bodyEelements.select("p");
             elementList.addAll(paragraphs.eachText());
 
-            System.out.println(elementList.size() + "\n");
+            Elements spans=bodyEelements.select("span");
+            elementList.addAll(spans.eachText());
+
+            Elements orderedList=bodyEelements.select("li");
+            elementList.addAll(orderedList.eachText());
+
+
+            Elements definedList=bodyEelements.select("dt");
+            elementList.addAll(spans.eachText());
+
+
+            System.out.println(definedList.size() + "\n");
 
             for (int i = 0; i < elementList.size(); i++) {
-                temp=elementList.get(i).split(" ");
+
+                temp=elementList.get(i).split("[-\\s]");
 
                 for (int k=0;k<temp.length;k++)
                 {
@@ -208,18 +238,11 @@ public class Indexer implements Runnable {
 
             }
 
-
         }
         else
             {
                 System.out.println("document = null \n");
             }
-
-
-
-
-
-
 
     }
 
@@ -229,43 +252,70 @@ public class Indexer implements Runnable {
 
         String temp;
 
-        int normal=splitedList.size();
+        float normal=splitedList.size();
 
-        int frequency=1;
+        float frequency=1;
 
         int j=0;
+
+        int k=0;
 
         while (j<splitedList.size()) {
 
             temp=splitedList.get(j);
 
+            int i=j+1;
 
 
-            for (int i = j+1; i < splitedList.size(); i++) {
+            while (i < splitedList.size()) {
 
                 if (splitedList.get(i).equals(temp))
                 {
+//                    System.out.println("item "+splitedList.get(i) +" at i="+i+"\n");
                     frequency++;
 
                     if (j==splitedList.size())
                     {
                         break;
                     }
+//                    System.out.println("item "+splitedList.get(i) +" at i="+i+" is removed"+"\n");
                     splitedList.remove(i);
 
+
+                }
+                else
+                {
+                    i++;
                 }
 
             }
 
 
             System.out.println("\n size = " +splitedList.size() + "\n");
-                relevantList.add(String.valueOf(frequency));
-            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf(frequency)+"\n");
-                frequency = 1;
-                j++;
+            relevantList.add(String.valueOf((frequency/normal)*100));
+            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf((frequency/normal)*100)+"\n");
+            frequency = 1;
+            j++;
 
 
         }
+
+        while (k<relevantList.size()) {
+
+            if (Float.parseFloat(relevantList.get(k))<=relavencyThreshold)
+            {
+                relevantList.remove(k);
+                splitedList.remove(k);
+
+            }
+            else
+            {
+                k++;
+            }
+
+
+        }
+
 
     }
 
