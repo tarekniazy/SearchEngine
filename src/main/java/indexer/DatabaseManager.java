@@ -33,7 +33,7 @@ public class DatabaseManager {
 
         DatabaseManager db = new DatabaseManager();
 
-        db.insertDocument("wow", "twitter.com", 50);
+        db.insertDocument("money", "twitter.com", 50);
     }
 
     public void insertDocument(String word, String url, int nf) {
@@ -51,13 +51,24 @@ public class DatabaseManager {
         }
         else { //word exists, incrementally update it
             DBObject result = cursor.next();
+            BasicDBList list;
+            if(result.get("data").getClass().getName().equals("com.mongodb.BasicDBList"))
+            {
+                list = (BasicDBList) result.get("data");
+                JSONObject json = createJSON(url, nf);
+                list.add(json);
+            }
+            else
+            {
+                BasicDBObject obj = (BasicDBObject) result.get("data");
+                JSONObject json = createJSON(url, nf);
+                list = new BasicDBList();
 
-            BasicDBList obj = (BasicDBList) result.get("data");
+                list.add(obj);
+                list.add(json);
+            }
 
-            JSONObject json = createJSON(url, nf);
-            obj.add(json);
-
-            collection.update(new BasicDBObject("word", word), new BasicDBObject("$set", new BasicDBObject("data", obj)));
+            collection.update(new BasicDBObject("word", word), new BasicDBObject("$set", new BasicDBObject("data", list)));
         }
 
 
