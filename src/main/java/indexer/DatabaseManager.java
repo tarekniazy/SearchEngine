@@ -33,10 +33,10 @@ public class DatabaseManager {
 
         DatabaseManager db = new DatabaseManager();
 
-        db.insertDocument("money", "twitter.com", 50);
+        db.insertDocument("hello", "twitter.com", 50);
     }
 
-    public void insertDocument(String word, String url, int nf) {
+    public void insertDocument(String word, String url, float nf) {
 
         DBObject query = new BasicDBObject("word", word);
         DBCursor cursor = collection.find(query);
@@ -82,7 +82,7 @@ public class DatabaseManager {
 //
 //    }
 
-    private JSONObject createJSON(String url, int NF) {
+    private JSONObject createJSON(String url, float NF) {
         JSONObject json = new JSONObject();
         json.put("NF", NF);
         json.put("url", url);

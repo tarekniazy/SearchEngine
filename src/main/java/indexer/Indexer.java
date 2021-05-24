@@ -19,10 +19,11 @@ import java.util.*;
 
 public class Indexer implements Runnable {
 
-   private static final double relavencyThreshold = 0.5;
+    private static final double relavencyThreshold = 0.5;
     private Thread thread;
     private List<String> splitedList=new ArrayList<>();
     private List<String> relevantList=new ArrayList<>();
+    DatabaseManager db = new DatabaseManager();
 
 
     public Indexer ()
@@ -77,6 +78,11 @@ public class Indexer implements Runnable {
         }
         System.out.println("\n" + indexer.relevantList.size() + "\n");
 
+        for (int i = 0; i < indexer.relevantList.size(); i++) {
+
+           indexer.db.insertDocument(indexer.splitedList.get(i), "url", Float.parseFloat(indexer.relevantList.get(i)));
+        }
+        System.out.println("DOne");
 
     }
 
@@ -85,7 +91,7 @@ public class Indexer implements Runnable {
         boolean removed=false;
 
 
-        String[] stopwords = {"comment","equals","stop","link","a","()","=","contact","here","share","1","2","3","4", "as", "able", "about", "above", "according", "accordingly", "across", "actually", "after", "afterwards", "again", "against", "aint", "all", "allow", "allows", "almost", "alone", "along", "already", "also", "although", "always", "am", "among", "amongst", "an", "and", "another", "any", "anybody", "anyhow", "anyone", "anything", "anyway", "anyways", "anywhere", "apart", "appear", "appreciate", "appropriate", "are", "arent", "around", "as", "aside", "ask", "asking", "associated", "at", "available", "away", "awfully", "be", "became", "because", "become", "becomes", "becoming", "been", "before", "beforehand", "behind", "being", "believe", "below", "beside", "besides", "best", "better", "between", "beyond", "both", "brief", "but", "by", "cmon", "cs", "came", "can", "cant", "cannot", "cant", "cause", "causes", "certain", "certainly", "changes", "clearly", "co", "com", "come", "comes", "concerning", "consequently", "consider", "considering", "contain", "containing", "contains", "corresponding", "could", "couldnt", "course", "currently", "definitely", "described", "despite", "did", "didnt", "different", "do", "does", "doesnt", "doing", "dont", "done", "down", "downwards", "during", "each", "edu", "eg", "eight", "either", "else", "elsewhere", "enough", "entirely", "especially", "et", "etc", "even", "ever", "every", "everybody", "everyone", "everything", "everywhere", "ex", "exactly", "example", "except", "far", "few", "ff", "fifth", "first", "five", "followed", "following", "follows", "for", "former", "formerly", "forth", "four", "from", "further", "furthermore", "get", "gets", "getting", "given", "gives", "go", "goes", "going", "gone", "got", "gotten", "greetings", "had", "hadnt", "happens", "hardly", "has", "hasnt", "have", "havent", "having", "he", "hes", "hello", "help", "hence", "her", "here", "heres", "hereafter", "hereby", "herein", "hereupon", "hers", "herself", "hi", "him", "himself", "his", "hither", "hopefully", "how", "howbeit", "however", "i", "id", "ill", "im", "ive", "ie", "if", "ignored", "immediate", "in", "inasmuch", "inc", "indeed", "indicate", "indicated", "indicates", "inner", "insofar", "instead", "into", "inward", "is", "isnt", "it", "itd", "itll", "its", "its", "itself", "just", "keep", "keeps", "kept", "know", "knows", "known", "last", "lately", "later", "latter", "latterly", "least", "less", "lest", "let", "lets", "like", "liked", "likely", "little", "look", "looking", "looks", "ltd", "mainly", "many", "may", "maybe", "me", "mean", "meanwhile", "merely", "might", "more", "moreover", "most", "mostly", "much", "must", "my", "myself", "name", "namely", "nd", "near", "nearly", "necessary", "need", "needs", "neither", "never", "nevertheless", "new", "next", "nine", "no", "nobody", "non", "none", "noone", "nor", "normally", "not", "nothing", "novel", "now", "nowhere", "obviously", "of", "off", "often", "oh", "ok", "okay", "old", "on", "once", "one", "ones", "only", "onto", "or", "other", "others", "otherwise", "ought", "our", "ours", "ourselves", "out", "outside", "over", "overall", "own", "particular", "particularly", "per", "perhaps", "placed", "please", "plus", "possible", "presumably", "probably", "provides", "que", "quite", "qv", "rather", "rd", "re", "really", "reasonably", "regarding", "regardless", "regards", "relatively", "respectively", "right", "said", "same", "saw", "say", "saying", "says", "second", "secondly", "see", "seeing", "seem", "seemed", "seeming", "seems", "seen", "self", "selves", "sensible", "sent", "serious", "seriously", "seven", "several", "shall", "she", "should", "shouldnt", "since", "six", "so", "some", "somebody", "somehow", "someone", "something", "sometime", "sometimes", "somewhat", "somewhere", "soon", "sorry", "specified", "specify", "specifying", "still", "sub", "such", "sup", "sure", "ts", "take", "taken", "tell", "tends", "th", "than", "thank", "thanks", "thanx", "that", "thats", "thats", "the", "their", "theirs", "them", "themselves", "then", "thence", "there", "theres", "thereafter", "thereby", "therefore", "therein", "theres", "thereupon", "these", "they", "theyd", "theyll", "theyre", "theyve", "think", "third", "this", "thorough", "thoroughly", "those", "though", "three", "through", "throughout", "thru", "thus", "to", "together", "too", "took", "toward", "towards", "tried", "tries", "truly", "try", "trying", "twice", "two", "un", "under", "unfortunately", "unless", "unlikely", "until", "unto", "up", "upon", "us", "use", "used", "useful", "uses", "using", "usually", "value", "various", "very", "via", "viz", "vs", "want", "wants", "was", "wasnt", "way", "we", "wed", "well", "were", "weve", "welcome", "well", "went", "were", "werent", "what", "whats", "whatever", "when", "whence", "whenever", "where", "wheres", "whereafter", "whereas", "whereby", "wherein", "whereupon", "wherever", "whether", "which", "while", "whither", "who", "whos", "whoever", "whole", "whom", "whose", "why", "will", "willing", "wish", "with", "within", "without", "wont", "wonder", "would", "would", "wouldnt", "yes", "yet", "you", "youd", "youll", "youre", "youve", "your", "yours", "yourself", "yourselves", "zero"};
+        String[] stopwords = {"comment","equals","stop","link","","a","()","=","contact","here","share","1","2","3","4", "as", "able", "about", "above", "according", "accordingly", "across", "actually", "after", "afterwards", "again", "against", "aint", "all", "allow", "allows", "almost", "alone", "along", "already", "also", "although", "always", "am", "among", "amongst", "an", "and", "another", "any", "anybody", "anyhow", "anyone", "anything", "anyway", "anyways", "anywhere", "apart", "appear", "appreciate", "appropriate", "are", "arent", "around", "as", "aside", "ask", "asking", "associated", "at", "available", "away", "awfully", "be", "became", "because", "become", "becomes", "becoming", "been", "before", "beforehand", "behind", "being", "believe", "below", "beside", "besides", "best", "better", "between", "beyond", "both", "brief", "but", "by", "cmon", "cs", "came", "can", "cant", "cannot", "cant", "cause", "causes", "certain", "certainly", "changes", "clearly", "co", "com", "come", "comes", "concerning", "consequently", "consider", "considering", "contain", "containing", "contains", "corresponding", "could", "couldnt", "course", "currently", "definitely", "described", "despite", "did", "didnt", "different", "do", "does", "doesnt", "doing", "dont", "done", "down", "downwards", "during", "each", "edu", "eg", "eight", "either", "else", "elsewhere", "enough", "entirely", "especially", "et", "etc", "even", "ever", "every", "everybody", "everyone", "everything", "everywhere", "ex", "exactly", "example", "except", "far", "few", "ff", "fifth", "first", "five", "followed", "following", "follows", "for", "former", "formerly", "forth", "four", "from", "further", "furthermore", "get", "gets", "getting", "given", "gives", "go", "goes", "going", "gone", "got", "gotten", "greetings", "had", "hadnt", "happens", "hardly", "has", "hasnt", "have", "havent", "having", "he", "hes", "hello", "help", "hence", "her", "here", "heres", "hereafter", "hereby", "herein", "hereupon", "hers", "herself", "hi", "him", "himself", "his", "hither", "hopefully", "how", "howbeit", "however", "i", "id", "ill", "im", "ive", "ie", "if", "ignored", "immediate", "in", "inasmuch", "inc", "indeed", "indicate", "indicated", "indicates", "inner", "insofar", "instead", "into", "inward", "is", "isnt", "it", "itd", "itll", "its", "its", "itself", "just", "keep", "keeps", "kept", "know", "knows", "known", "last", "lately", "later", "latter", "latterly", "least", "less", "lest", "let", "lets", "like", "liked", "likely", "little", "look", "looking", "looks", "ltd", "mainly", "many", "may", "maybe", "me", "mean", "meanwhile", "merely", "might", "more", "moreover", "most", "mostly", "much", "must", "my", "myself", "name", "namely", "nd", "near", "nearly", "necessary", "need", "needs", "neither", "never", "nevertheless", "new", "next", "nine", "no", "nobody", "non", "none", "noone", "nor", "normally", "not", "nothing", "novel", "now", "nowhere", "obviously", "of", "off", "often", "oh", "ok", "okay", "old", "on", "once", "one", "ones", "only", "onto", "or", "other", "others", "otherwise", "ought", "our", "ours", "ourselves", "out", "outside", "over", "overall", "own", "particular", "particularly", "per", "perhaps", "placed", "please", "plus", "possible", "presumably", "probably", "provides", "que", "quite", "qv", "rather", "rd", "re", "really", "reasonably", "regarding", "regardless", "regards", "relatively", "respectively", "right", "said", "same", "saw", "say", "saying", "says", "second", "secondly", "see", "seeing", "seem", "seemed", "seeming", "seems", "seen", "self", "selves", "sensible", "sent", "serious", "seriously", "seven", "several", "shall", "she", "should", "shouldnt", "since", "six", "so", "some", "somebody", "somehow", "someone", "something", "sometime", "sometimes", "somewhat", "somewhere", "soon", "sorry", "specified", "specify", "specifying", "still", "sub", "such", "sup", "sure", "ts", "take", "taken", "tell", "tends", "th", "than", "thank", "thanks", "thanx", "that", "thats", "thats", "the", "their", "theirs", "them", "themselves", "then", "thence", "there", "theres", "thereafter", "thereby", "therefore", "therein", "theres", "thereupon", "these", "they", "theyd", "theyll", "theyre", "theyve", "think", "third", "this", "thorough", "thoroughly", "those", "though", "three", "through", "throughout", "thru", "thus", "to", "together", "too", "took", "toward", "towards", "tried", "tries", "truly", "try", "trying", "twice", "two", "un", "under", "unfortunately", "unless", "unlikely", "until", "unto", "up", "upon", "us", "use", "used", "useful", "uses", "using", "usually", "value", "various", "very", "via", "viz", "vs", "want", "wants", "was", "wasnt", "way", "we", "wed", "well", "were", "weve", "welcome", "well", "went", "were", "werent", "what", "whats", "whatever", "when", "whence", "whenever", "where", "wheres", "whereafter", "whereas", "whereby", "wherein", "whereupon", "wherever", "whether", "which", "while", "whither", "who", "whos", "whoever", "whole", "whom", "whose", "why", "will", "willing", "wish", "with", "within", "without", "wont", "wonder", "would", "would", "wouldnt", "yes", "yet", "you", "youd", "youll", "youre", "youve", "your", "yours", "yourself", "yourselves", "zero"};
 
         for(int i=0;i<splitedList.size();i++)
         {
@@ -106,7 +112,7 @@ public class Indexer implements Runnable {
                 splitedList.set(i,sb2.toString());
             }
 
-                if (splitedList.get(i).endsWith(".")||splitedList.get(i).endsWith("!")||splitedList.get(i).endsWith(",")||splitedList.get(i).endsWith(":")||splitedList.get(i).endsWith(";")||splitedList.get(i).endsWith("@")||splitedList.get(i).endsWith("#")||splitedList.get(i).endsWith("$")||splitedList.get(i).endsWith("%")||splitedList.get(i).endsWith("^")||splitedList.get(i).endsWith("&")||splitedList.get(i).endsWith("*")||splitedList.get(i).endsWith(")")||splitedList.get(i).endsWith("(")||splitedList.get(i).endsWith("}")||splitedList.get(i).endsWith("]")||splitedList.get(i).endsWith(">")||splitedList.get(i).endsWith("?")||splitedList.get(i).endsWith("'")||splitedList.get(i).endsWith("\""))
+            if (splitedList.get(i).endsWith(".")||splitedList.get(i).endsWith("!")||splitedList.get(i).endsWith(",")||splitedList.get(i).endsWith(":")||splitedList.get(i).endsWith(";")||splitedList.get(i).endsWith("@")||splitedList.get(i).endsWith("#")||splitedList.get(i).endsWith("$")||splitedList.get(i).endsWith("%")||splitedList.get(i).endsWith("^")||splitedList.get(i).endsWith("&")||splitedList.get(i).endsWith("*")||splitedList.get(i).endsWith(")")||splitedList.get(i).endsWith("(")||splitedList.get(i).endsWith("}")||splitedList.get(i).endsWith("]")||splitedList.get(i).endsWith(">")||splitedList.get(i).endsWith("?")||splitedList.get(i).endsWith("'")||splitedList.get(i).endsWith("\""))
             {
                 StringBuilder sb = new StringBuilder(splitedList.get(i));
 
@@ -127,49 +133,49 @@ public class Indexer implements Runnable {
 
         for (int i = 0; i < splitedList.size(); i++) {
 
-          splitedList.set(i,splitedList.get(i).toLowerCase());
+            splitedList.set(i,splitedList.get(i).toLowerCase());
 
         }
 
         for (int i = 0; i < stopwords.length; i++) {
 
 
-                stopwords[i] = stopwords[i].toLowerCase();
+            stopwords[i] = stopwords[i].toLowerCase();
 
 
         }
 
         int j=0;
 
-       while(j<splitedList.size())
-       {
+        while(j<splitedList.size())
+        {
 //                System.out.println("\n j= " +j + "\n");
 
-               removed=false;
+            removed=false;
 
 //           System.out.println("\n size = " +splitedList.size() + "\n");
 
-                for (int i = 0; i < stopwords.length; i++) {
+            for (int i = 0; i < stopwords.length; i++) {
 
-                    if(stopwords[i].equals(splitedList.get(j))||splitedList.get(j).contains("’"))
-                    {
-                        System.out.println("\n going to remove \n");
-                        splitedList.remove(j);
-                        System.out.println("\n item removed \n");
-                        removed=true;
-                        break;
-                    }
-
-                }
-
-                if (removed==false)
+                if(stopwords[i].equals(splitedList.get(j))||splitedList.get(j).contains("’"))
                 {
-                    j++;
+                    System.out.println("\n going to remove \n");
+                    splitedList.remove(j);
+                    System.out.println("\n item removed \n");
+                    removed=true;
+                    break;
                 }
+
+            }
+
+            if (removed==false)
+            {
+                j++;
+            }
 
 //                System.out.println("\n size = " +splitedList.size() + "\n");
 
-       }
+        }
 
 
 
@@ -186,7 +192,7 @@ public class Indexer implements Runnable {
         String[] temp;
 
 
-         int j=1;
+        int j=1;
 
 
 
@@ -196,8 +202,8 @@ public class Indexer implements Runnable {
 
             System.out.println("document is not empty \n");
 
-                 Element body = doc.body();
-                Elements bodyEelements=body.getAllElements();
+            Element body = doc.body();
+            Elements bodyEelements=body.getAllElements();
 
 
             while (doc.select("h" + j).size()!=0) {
@@ -206,9 +212,9 @@ public class Indexer implements Runnable {
 
 
 
-                   elementList.addAll(headers.eachText());
+                elementList.addAll(headers.eachText());
 
-                   j++;
+                j++;
 
             }
             Elements paragraphs=bodyEelements.select("p");
@@ -241,9 +247,9 @@ public class Indexer implements Runnable {
 
         }
         else
-            {
-                System.out.println("document = null \n");
-            }
+        {
+            System.out.println("document = null \n");
+        }
 
     }
 
@@ -294,7 +300,7 @@ public class Indexer implements Runnable {
 
             System.out.println("\n size = " +splitedList.size() + "\n");
             relevantList.add(String.valueOf((frequency/normal)*100));
-            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf((frequency/normal)*100)+"\n");
+            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf((normal/frequency)*100)+"\n");
             frequency = 1;
             j++;
 
