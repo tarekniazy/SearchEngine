@@ -1,0 +1,10 @@
+https://crawler-test.com/mobile/separate_desktop_with_different_h1
+https://crawler-test.com/description_tags/duplicate_description_and_noindex/foo
+https://crawler-test.com/
+https://crawler-test.com/mobile/separate_desktop
+https://crawler-test.com/mobile/desktop_with_AMP_as_mobile
+https://crawler-test.com/mobile/separate_desktop_with_different_title
+https://crawler-test.com/mobile/separate_desktop_with_different_wordcount
+https://crawler-test.com/mobile/separate_desktop_with_different_links_in
+https://crawler-test.com/mobile/separate_desktop_with_different_links_out
+https://crawler-test.com/mobile/separate_desktop_with_mobile_not_subdomain
