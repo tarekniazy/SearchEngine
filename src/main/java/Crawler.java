@@ -54,11 +54,12 @@ public class Crawler {
                 break;
             }
         }
-        if(arrOfStr.length==0){
+        if(arrOfStr.length==0) {
             return true;
-        }else if((arrOfStr[1].split(" ", 3)[1]).equals("/")){
-            return false;
         }
+//        }else if((arrOfStr[1].split(" ", 3)[1]).equals("/")){
+//            return false;
+//        }
         if(arrOfStr[arrOfStr.length-1].contains("\n</body>")){
             arrOfStr[arrOfStr.length-1]=arrOfStr[arrOfStr.length-1].replace("\n</body>","");
         }
