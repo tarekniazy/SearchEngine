@@ -23,7 +23,7 @@ public class Indexer implements Runnable {
     private Thread thread;
     private List<String> splitedList=new ArrayList<>();
     private List<String> relevantList=new ArrayList<>();
-    DatabaseManager db = new DatabaseManager();
+//    DatabaseManager db = new DatabaseManager();
 
 
     public Indexer ()
@@ -57,7 +57,7 @@ public class Indexer implements Runnable {
         Indexer indexer = new Indexer();
         Document doc=indexer.requestDocument("https://en.wikipedia.org/wiki/Prison#:~:text=A%20prison%2C%20also%20known%20as,remand%20center%2C%20is%20a%20facility");  //
         indexer.parseDocument(doc);
-        indexer.preProcessing();
+        indexer.docProcessing();
         indexer.relevant();
 
         //https://www.geeksforgeeks.org/map-interface-java-examples/
@@ -78,15 +78,21 @@ public class Indexer implements Runnable {
         }
         System.out.println("\n" + indexer.relevantList.size() + "\n");
 
-        for (int i = 0; i < indexer.relevantList.size(); i++) {
-
-           indexer.db.insertDocument(indexer.splitedList.get(i), "url", Float.parseFloat(indexer.relevantList.get(i)));
-        }
-        System.out.println("DOne");
+//        for (int i = 0; i < indexer.relevantList.size(); i++) {
+//
+//           indexer.db.insertDocument(indexer.splitedList.get(i), "url", Float.parseFloat(indexer.relevantList.get(i)));
+//        }
+//        System.out.println("DOne");
 
     }
 
-    void preProcessing()
+    String wordProcessing (String s)
+    {
+        String temp =s.toLowerCase();
+        return temp;
+    }
+
+    void docProcessing()
     {
         boolean removed=false;
 
@@ -133,14 +139,14 @@ public class Indexer implements Runnable {
 
         for (int i = 0; i < splitedList.size(); i++) {
 
-            splitedList.set(i,splitedList.get(i).toLowerCase());
+            splitedList.set(i,wordProcessing(splitedList.get(i)));
 
         }
 
         for (int i = 0; i < stopwords.length; i++) {
 
 
-            stopwords[i] = stopwords[i].toLowerCase();
+            stopwords[i] = wordProcessing(stopwords[i]);
 
 
         }
@@ -300,7 +306,7 @@ public class Indexer implements Runnable {
 
             System.out.println("\n size = " +splitedList.size() + "\n");
             relevantList.add(String.valueOf((frequency/normal)*100));
-            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf((normal/frequency)*100)+"\n");
+            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf((frequency/normal)*100)+"\n");
             frequency = 1;
             j++;
 
