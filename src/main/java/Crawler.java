@@ -5,6 +5,7 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Crawler {
     private List<String> list;
@@ -26,12 +27,14 @@ public class Crawler {
     }
     public boolean Disallowed(String link, String URL) {
         String lin;
-        if(link.substring(link.length() - 1).equals("/")){
-            lin=link+"robots.txt";
-        }else{
-            lin=link+"/robots.txt";
-
-        }
+//        if(link.substring(link.length() - 1).equals("/")){
+//            lin=link+"robots.txt";
+//        }else{
+//            lin=link+"/robots.txt";
+//
+//        }
+        lin=(link+"/robots.txt").replace("//","/");
+        URL=URL.replace("//","/");
         Document document;
         try{
             document = Jsoup.connect(lin).get();
@@ -40,16 +43,41 @@ public class Crawler {
         }
         Elements PRE = document.select("body");
         String pre=PRE.toString();
-        String[] arrOfStr = pre.split("Disallow:");
-        Arrays.sort(arrOfStr, Comparator.comparingInt(String::length));
+        String[] arrOfStr = pre.split("User-agent:");
+        //Arrays.sort(arrOfStr, Comparator.comparingInt(String::length));
+        String s;
+        for (int i=0;i<arrOfStr.length;i++){
+            if(arrOfStr[i].contains(" *")){
+                s=arrOfStr[i];
+                arrOfStr=s.split(" Disallow:");
+                break;
+            }
+        }
         if(arrOfStr.length==0){
             return true;
-        }else if((arrOfStr[0].split(" ", 3)[1]).equals("/")){
+        }else if((arrOfStr[1].split(" ", 3)[1]).equals("/")){
             return false;
         }
-        for(int i=0;i<arrOfStr.length-2;i++) {
-            if (URL.contains(arrOfStr[i].split(" ", 3)[1]) || URL.contains(arrOfStr[i].split("\\*", 3)[0]) || URL.contains(arrOfStr[i].split("\\*", 3)[1])) {
-                return false;
+        if(arrOfStr[arrOfStr.length-1].contains("\n</body>")){
+            arrOfStr[arrOfStr.length-1]=arrOfStr[arrOfStr.length-1].replace("\n</body>","");
+        }
+        for(int i=1;i<arrOfStr.length-1;i++) {
+            if(arrOfStr[i].contains("*")){
+                String S1=(link+arrOfStr[i]).replace("/ /","/");
+                S1=S1.replace("//","/");
+                S1=S1.replace("*",".*");
+                if(Pattern.matches(S1,URL)){
+                    return false;
+                }
+
+            }
+            else{
+                String S1=(link+arrOfStr[i].split(" ", 3)[1]).replace("/ /","/");
+                S1=S1.replace("//","/");
+                if ((URL.equals(S1))){
+                    return false;
+                }
+
             }
         }
 
@@ -71,7 +99,7 @@ public class Crawler {
                         break;
                     }
                     //&&(Disallowed(list.get(index),page.attr("abs:href")))
-                    else if((!list.contains(page.attr("abs:href")))){
+                    else if((!list.contains(page.attr("abs:href")))&&(Disallowed(list.get(index),page.attr("abs:href")))){
                         list.add(page.attr("abs:href"));
 
                     }
