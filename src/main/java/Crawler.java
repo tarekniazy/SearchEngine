@@ -2,7 +2,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
+import java.util.regex.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -27,20 +27,21 @@ public class Crawler {
     }
     public boolean Disallowed(String link, String URL) {
         String lin;
-//        if(link.substring(link.length() - 1).equals("/")){
-//            lin=link+"robots.txt";
-//        }else{
-//            lin=link+"/robots.txt";
-//
-//        }
-        lin=(link+"/robots.txt").replace("//","/");
-        URL=URL.replace("//","/");
+        if(link.substring(link.length() - 1).equals("/")){
+            lin=link+"robots.txt";
+        }else{
+            lin=link+"/robots.txt";
+
+        }
         Document document;
         try{
             document = Jsoup.connect(lin).get();
         }catch (IOException e){
+//            System.out.println("truuuuu");
             return true;
         }
+        lin=(lin+"/robots.txt").replace("//","/");
+        URL=URL.replace("//","/");
         Elements PRE = document.select("body");
         String pre=PRE.toString();
         String[] arrOfStr = pre.split("User-agent:");
@@ -66,6 +67,7 @@ public class Crawler {
                 String S1=(link+arrOfStr[i]).replace("/ /","/");
                 S1=S1.replace("//","/");
                 S1=S1.replace("*",".*");
+                System.out.println(S1);
                 if(Pattern.matches(S1,URL)){
                     return false;
                 }
@@ -74,6 +76,7 @@ public class Crawler {
             else{
                 String S1=(link+arrOfStr[i].split(" ", 3)[1]).replace("/ /","/");
                 S1=S1.replace("//","/");
+                System.out.println(S1);
                 if ((URL.equals(S1))){
                     return false;
                 }
@@ -99,7 +102,7 @@ public class Crawler {
                         break;
                     }
                     //&&(Disallowed(list.get(index),page.attr("abs:href")))
-                    else if((!list.contains(page.attr("abs:href")))&&(Disallowed(list.get(index),page.attr("abs:href")))){
+                    else if((!list.contains(page.attr("abs:href"))) && (Disallowed(list.get(index),page.attr("abs:href")))){
                         list.add(page.attr("abs:href"));
 
                     }
