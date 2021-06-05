@@ -23,15 +23,22 @@ public class Indexer implements Runnable {
     private Thread thread;
     private List<String> splitedList=new ArrayList<>();
     private List<String> relevantList=new ArrayList<>();
+    private List<Document> docs=new ArrayList<Document>();
+    private List<String> urls=new ArrayList<String>();
+
+
     PorterStemmer porterStemmer = new PorterStemmer();
-    DatabaseManager db = new DatabaseManager();
+    DatabaseManager db;
 
 
-    public Indexer ()
+    public Indexer (List<Document> documents, DatabaseManager dbase,List<String> urlsList)
     {
+        docs = documents;
 
         thread =new Thread(this);
         thread.start();
+        db=dbase;
+        urls=urlsList;
 
 //        splitedList.add("java");
 //        splitedList.add("java");
@@ -53,43 +60,67 @@ public class Indexer implements Runnable {
 
     }
 
-    public static void main(String[] args)
-    {
-        Indexer indexer = new Indexer();
-        Document doc=indexer.requestDocument("https://en.wikipedia.org/wiki/Prison#:~:text=A%20prison%2C%20also%20known%20as,remand%20center%2C%20is%20a%20facility");  //
-        indexer.parseDocument(doc);
-        indexer.docProcessing();
-        indexer.relevant();
-
-        //https://www.geeksforgeeks.org/map-interface-java-examples/
-        //https://www.netflix.com/eg-en/browse/genre/7424
-        //
-
-
-        for (int i = 0; i < indexer.splitedList.size(); i++) {
-
-            System.out.println("\n" +indexer.splitedList.get(i) + "\n");
-
-        }
-
-        for (int i = 0; i < indexer.relevantList.size(); i++) {
-
-            System.out.println("\n" +indexer.relevantList.get(i) + "\n");
-
-        }
-        System.out.println("\n" + indexer.relevantList.size() + "\n");
-
+//    public static void main(String[] args)
+//    {
+//        Indexer indexer = new Indexer();
+//        Document doc=indexer.requestDocument("https://en.wikipedia.org/wiki/Prison#:~:text=A%20prison%2C%20also%20known%20as,remand%20center%2C%20is%20a%20facility");  //
+//        indexer.parseDocument(doc);
+//        indexer.docProcessing();
+//        indexer.relevant();
+//
+//        //https://www.geeksforgeeks.org/map-interface-java-examples/
+//        //https://www.netflix.com/eg-en/browse/genre/7424
+//        //
+//
+//
+//        for (int i = 0; i < indexer.splitedList.size(); i++) {
+//
+//            System.out.println("\n" +indexer.splitedList.get(i) + "\n");
+//
+//        }
+//
 //        for (int i = 0; i < indexer.relevantList.size(); i++) {
 //
-//           indexer.db.insertDocument(indexer.splitedList.get(i), "url", Float.parseFloat(indexer.relevantList.get(i)));
+//            System.out.println("\n" +indexer.relevantList.get(i) + "\n");
+//
 //        }
-//        System.out.println("Done");
-
-    }
+//        System.out.println("\n" + indexer.relevantList.size() + "\n");
+//
+////        for (int i = 0; i < indexer.relevantList.size(); i++) {
+////
+////           indexer.db.insertDocument(indexer.splitedList.get(i), "url", Float.parseFloat(indexer.relevantList.get(i)));
+////        }
+////        System.out.println("Done");
+//
+//    }
 
     @Override
     public void run()
     {
+        for (int i=0;i<docs.size();i++)
+        {
+            parseDocument(docs.get(i));
+            docProcessing();
+            relevant();
+            System.out.println(urls.size());
+            System.out.println(docs.size());
+            System.out.println("................");
+            System.out.println(splitedList.size());
+            System.out.println(relevantList.size());
+
+
+            System.out.println(urls.get(i));
+
+            for (int j = 0; j < relevantList.size(); j++) {
+
+           db.insertDocument(splitedList.get(j),urls.get(i), Float.parseFloat(relevantList.get(j)));
+         }
+            System.out.println("Done");
+
+            splitedList.clear();
+            relevantList.clear();
+        }
+
 
     }
 

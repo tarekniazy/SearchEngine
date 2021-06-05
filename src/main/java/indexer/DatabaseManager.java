@@ -26,7 +26,7 @@ public class DatabaseManager {
     DBCollection collection;
     DBCollection urlCollection;
 
-    DatabaseManager() {
+   public DatabaseManager() {
         uri = new MongoClientURI("mongodb+srv://admin:Khaled1999@cluster0.5toq8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 
         mongoClient = new MongoClient(uri);
