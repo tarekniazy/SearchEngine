@@ -1,3 +1,0 @@
-https://crawler-test.com/mobile/separate_desktop_with_different_h1
-https://crawler-test.com/description_tags/duplicate_description_and_noindex/foo
-https://crawler-test.com/
