@@ -4,19 +4,26 @@ import com.mongodb.*;
 //import java.net.UnknownHostException;
 //import com.mongodb.client.MongoCollection;
 //import com.mongodb.client.MongoDatabase;
-//import com.mongodb.util.JSON;
+import com.mongodb.util.JSON;
 //import org.bson.Document;
 import com.mongodb.MongoClient;
 //import org.json.simple.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import java.lang.Math;
+import java.util.ArrayList;
+import java.util.List;
+
 //import java.util.*;
 //import javax.print.Doc;
+import static com.mongodb.client.model.Filters.*;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.MongoClientSettings;
+
+import javax.swing.text.Document;
 
 public class DatabaseManager {
 
@@ -25,6 +32,7 @@ public class DatabaseManager {
     DB database;
     DBCollection collection;
     DBCollection urlCollection;
+    DBCollection compactCollection;
 
    public DatabaseManager() {
         uri = new MongoClientURI("mongodb+srv://admin:Khaled1999@cluster0.5toq8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
@@ -33,15 +41,35 @@ public class DatabaseManager {
         database = mongoClient.getDB("myDatabase");
         collection = database.getCollection("indexer");
         urlCollection = database.getCollection("urls");
+        compactCollection = database.getCollection("compact");
+
     }
 
     public static void main( String args[] ) {
 
 
         DatabaseManager db = new DatabaseManager();
+//        db.insertURL("Ahmed");
+//        db.insertURL("Ahmed");
+//        db.insertComopact("Roaaaa");
+//        db.insertComopact("Roaaaa");
+//        db.insertComopact("Lailaa");
+//        db.insertComopact("Khaaleeeeed");
+//
+//        List<String>text=db.retrieveCompact();
+//
+//        for (int i=0;i<text.size();i++)
+//        {
+//            System.out.println(text.get(i));
+//        }
 
-        //db.insertDocument("ahmed", "facebook.com", 50);
-        db.queryWord("ahmed");
+//        System.out.println(db.retrieveURLs().size());
+
+
+
+
+//        //db.insertDocument("ahmed", "facebook.com", 50);
+//        db.queryWord("ahmed");
     }
 
     public void insertDocument(String word, String url, float tf) {
@@ -95,6 +123,51 @@ public class DatabaseManager {
 
     }
 
+    public void insertComopact(String Str)
+    {
+        DBObject query = new BasicDBObject("compact", Str);
+        DBCursor cursor = compactCollection.find(query);
+
+        if (cursor.one()==null)
+        {
+            DBObject dbObject = new BasicDBObject().append("compact", Str);
+            compactCollection.insert(dbObject);
+        }
+
+
+
+    }
+
+    public List<String> retrieveCompact()
+    {
+        DBObject query = new BasicDBObject();
+        DBCursor cursor = compactCollection.find(query);
+
+        List<String> urls=new ArrayList<String>();
+        while (cursor.hasNext()) {
+            DBObject obj = cursor.next();
+            urls.add((String) obj.get("compact"));
+        }
+
+        return urls;
+    }
+
+    public List<String> retrieveAllUrls()
+    {
+        DBObject query = new BasicDBObject();
+        DBCursor cursor = urlCollection.find(query);
+
+        List<String> urls=new ArrayList<String>();
+        while (cursor.hasNext()) {
+            DBObject obj = cursor.next();
+            urls.add((String) obj.get("url"));
+        }
+
+        return urls;
+    }
+
+
+
     public void queryWord(String word) {
 
         DBObject query = new BasicDBObject("word", word);
@@ -129,5 +202,39 @@ public class DatabaseManager {
         json.put("url", url);
 
         return json;
+    }
+
+
+    public void insertURL(String url) {
+
+        DBObject query = new BasicDBObject("url", url);
+        DBCursor cursor = urlCollection.find(query);
+
+            if (cursor.one()==null)
+            {
+                DBObject dbObject = new BasicDBObject().append("url", url).append("visited", false);
+                urlCollection.insert(dbObject);
+            }
+
+
+
+
+    }
+
+    public List<String> retrieveURLs(boolean flag) {
+        DBObject query = new BasicDBObject("visited", flag);
+        DBCursor cursor = urlCollection.find(query);
+
+        List<String> urls=new ArrayList<String>();
+        while (cursor.hasNext()) {
+            DBObject obj = cursor.next();
+            urls.add((String) obj.get("url"));
+        }
+
+        return urls;
+    }
+    public void makeVisited(String url) {
+        urlCollection.update(new BasicDBObject("url", url),
+                new BasicDBObject("$set", new BasicDBObject().append("visited", true)));
     }
 }

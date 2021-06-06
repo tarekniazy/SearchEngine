@@ -33,6 +33,8 @@ public class Indexer implements Runnable {
 
     public Indexer (List<Document> documents, DatabaseManager dbase,List<String> urlsList)
     {
+        System.out.println("Indexer Entered");
+
         docs = documents;
 
         thread =new Thread(this);
@@ -97,9 +99,10 @@ public class Indexer implements Runnable {
     @Override
     public void run()
     {
-        for (int i=0;i<docs.size();i++)
+        for (int i=0;i<urls.size();i++)
         {
-            parseDocument(docs.get(i));
+
+            parseDocument(requestDocument(urls.get(i)));
             docProcessing();
             relevant();
             System.out.println(urls.size());
@@ -373,6 +376,7 @@ public class Indexer implements Runnable {
 
     public Document requestDocument(String url)
     {
+        System.out.println(url);
         try {
 
             Connection con = Jsoup.connect(url);
