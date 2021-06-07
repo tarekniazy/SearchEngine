@@ -72,7 +72,7 @@ public class DatabaseManager {
 //        db.queryWord("ahmed");
     }
 
-    public void insertDocument(String word, String url, float tf) {
+    public void insertDocument(String word, String url, float tf, String title, String description) {
 
         int totalDocumentForWord;
         double idf = (double) urlCollection.count();
@@ -83,7 +83,7 @@ public class DatabaseManager {
         if(cursor.one() == null) //word will be inserted for the first time
         {
             idf = Math.log10(idf);
-            JSONObject json = createJSON(url, tf);
+            JSONObject json = createJSON(url, tf, title, description);
             DBObject dbObject = new BasicDBObject().append("word", word).append("numberOfDocuments", 1).append("idf", idf).append("data", json);
 
             collection.insert(dbObject);
@@ -97,13 +97,13 @@ public class DatabaseManager {
             if(result.get("data").getClass().getName().equals("com.mongodb.BasicDBList"))
             {
                 list = (BasicDBList) result.get("data");
-                JSONObject json = createJSON(url, tf);
+                JSONObject json = createJSON(url, tf, title, description);
                 list.add(json);
             }
             else
             {
                 BasicDBObject obj = (BasicDBObject) result.get("data");
-                JSONObject json = createJSON(url, tf);
+                JSONObject json = createJSON(url, tf, title, description);
                 list = new BasicDBList();
 
                 list.add(obj);
@@ -111,16 +111,20 @@ public class DatabaseManager {
             }
 
             collection.update(new BasicDBObject("word", word),
-                              new BasicDBObject("$set", new BasicDBObject().append("data", list).append("idf", idf).append("numberOfDocuments", totalDocumentForWord)));
+                    new BasicDBObject("$set", new BasicDBObject().append("data", list).append("idf", idf).append("numberOfDocuments", totalDocumentForWord)));
 
-
-//            collection.update(new BasicDBObject("word", new BasicDBObject("$ne", word)),
-//                              new BasicDBObject("set", new BasicDBObject().append("idf", 10)));
-//            collection.update(new BasicDBObject("word", {"$ne": word}),
-//            new BasicDBObject("set", new BasicDBObject().append("idf", Math.log10())));
         }
 
 
+    }
+    private JSONObject createJSON(String url, float tf, String title, String description) {
+        JSONObject json = new JSONObject();
+        json.put("tf", tf);
+        json.put("url", url);
+        json.put("title", title);
+        json.put("description", description);
+
+        return json;
     }
 
     public void insertComopact(String Str)
@@ -196,13 +200,7 @@ public class DatabaseManager {
 
     }
 
-    private JSONObject createJSON(String url, float tf) {
-        JSONObject json = new JSONObject();
-        json.put("tf", tf);
-        json.put("url", url);
 
-        return json;
-    }
 
 
     public void insertURL(String url) {

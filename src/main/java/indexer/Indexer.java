@@ -111,12 +111,45 @@ public class Indexer implements Runnable {
             System.out.println(splitedList.size());
             System.out.println(relevantList.size());
 
-
+            Element header;
+            Element title;
             System.out.println(urls.get(i));
 
             for (int j = 0; j < relevantList.size(); j++) {
 
-           db.insertDocument(splitedList.get(j),urls.get(i), Float.parseFloat(relevantList.get(j)));
+                Connection con = Jsoup.connect(urls.get(i));
+                try {
+                    Document doc = con.get();
+                    if (doc.select("h1").size()>0) {
+                         header = doc.select("h1").first();
+                    }
+                    else
+                    {
+                        header =  doc.select("title").first();
+                    }
+                    Element des= doc.select("p").first();
+
+//                    int k=(des.text()).indexOf(',');
+
+//                    Element headers = bodyEelements.select("h1");
+//
+                     String str="";
+
+                     if (des!=null)
+                     {
+                         str=des.text();
+                     }
+
+                    db.insertDocument(splitedList.get(j),urls.get(i), Float.parseFloat(relevantList.get(j)),header.text(),str);
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+
+
          }
             System.out.println("Done");
 

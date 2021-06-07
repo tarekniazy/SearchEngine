@@ -161,7 +161,7 @@ public class Crawler implements Runnable{
     public static List<String> list,Compact,visited;
     public static List<Document> documents;
     int number_of_threads;
-    private static final int MAX_DEPTH = 20;
+    private static final int MAX_DEPTH = 1000;
     private static  int Threshold;
     FileWriter Write;
     private Thread thread;
@@ -325,7 +325,9 @@ public class Crawler implements Runnable{
 
 
                                     list.add(page.attr("abs:href"));
-                                    if (list.size()%Threshold==0)
+
+
+                                    if (list.size()%Threshold==0 || list.size()== (MAX_DEPTH-base))
                                     {
                                         synchronized (db)
                                         {
@@ -369,6 +371,7 @@ public class Crawler implements Runnable{
 
     public boolean compact_string(String URL) throws IOException {
         String comp="";
+        System.out.println(URL);
         Document document = Jsoup.connect(URL).get();
         Elements para = document.select("p");
         for (Element page : para) {
@@ -475,7 +478,7 @@ public class Crawler implements Runnable{
 
 
 
-        int number_of_threads=3;
+        int number_of_threads=20;
         int list_size=list_c.size()/number_of_threads;
         System.out.print("list size"+list_size);
         List<Thread> Cr= new ArrayList<Thread>();
