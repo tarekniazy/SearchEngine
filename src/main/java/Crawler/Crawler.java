@@ -13,150 +13,7 @@ import indexer.Indexer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-//public class Crawler.Crawler implements Runnable{
-//    private List<String> list;
-//    private static final int MAX_DEPTH = 10;
-//    FileReader Read;
-//    FileWriter Write;
-//    BufferedReader bufferedReader;
-//    public Crawler.Crawler() throws IOException {
-//        list=new ArrayList<String>();
-//        File myObj = new File("Visited.txt");
-//        Read=new FileReader("src/main/Intial.txt");
-//        Write=new FileWriter("Visited.txt");
-//        bufferedReader = new BufferedReader(Read);
-//        String line;
-//        while ((line = bufferedReader.readLine()) != null) {
-//            list.add(line);
-//        }
-//        Read.close();
-//    }
-//    public boolean Disallowed(String link, String URL) {
-//        String lin;
-//        if(link.substring(link.length() - 1).equals("/")){
-//            lin=link+"robots.txt";
-//        }else{
-//            lin=link+"/robots.txt";
-//
-//        }
-//        Document document;
-//        try{
-//            document = Jsoup.connect(lin).get();
-//        }catch (IOException e){
-////            System.out.println("truuuuu");
-//            return true;
-//        }
-//        lin=(lin+"/robots.txt").replace("//","/");
-//        URL=URL.replace("//","/");
-//        Elements PRE = document.select("body");
-//        String pre=PRE.toString();
-//        String[] arrOfStr = pre.split("User-agent:");
-//        //Arrays.sort(arrOfStr, Comparator.comparingInt(String::length));
-//        String s;
-//        for (int i=0;i<arrOfStr.length;i++){
-//            if(arrOfStr[i].contains(" *")){
-//                s=arrOfStr[i];
-//                arrOfStr=s.split(" Disallow:");
-//                break;
-//            }
-//        }
-//        if(arrOfStr.length==0) {
-//            return true;
-//        }
-////        }else if((arrOfStr[1].split(" ", 3)[1]).equals("/")){
-////            return false;
-////        }
-//        if(arrOfStr[arrOfStr.length-1].contains("\n</body>")){
-//            arrOfStr[arrOfStr.length-1]=arrOfStr[arrOfStr.length-1].replace("\n</body>","");
-//        }
-//        for(int i=1;i<arrOfStr.length-1;i++) {
-//            if(arrOfStr[i].contains("*")){
-//                String S1=(link+arrOfStr[i]).replace("/ /","/");
-//                S1=S1.replace("//","/");
-//                S1=S1.replace("*",".*");
-//                System.out.println(S1);
-//                if(Pattern.matches(S1,URL)){
-//                    return false;
-//                }
-//
-//            }
-//            else{
-//                String S1=(link+arrOfStr[i].split(" ", 3)[1]).replace("/ /","/");
-//                S1=S1.replace("//","/");
-//                System.out.println(S1);
-//                if ((URL.equals(S1))){
-//                    return false;
-//                }
-//
-//            }
-//        }
-//
-//
-//
-//        return true;
-//    }
-//    public void Crawling() throws IOException {
-//        int index=0;
-//        while(list.size()<MAX_DEPTH){
-//            Write.write(list.get(index)+"\n");
-//            try {
-//
-//                Document document = Jsoup.connect(list.get(index)).get();
-//                Elements linksOnPage = document.select("a[href]");
-//
-//                for (Element page : linksOnPage) {
-//                    if(list.size()>=MAX_DEPTH){
-//                        break;
-//                    }
-//                    //&&(Disallowed(list.get(index),page.attr("abs:href")))
-//                    else if((!list.contains(page.attr("abs:href"))) && (Disallowed(list.get(index),page.attr("abs:href")))){
-//                        list.add(page.attr("abs:href"));
-//
-//                    }
-//                }
-//            } catch (IOException e) {
-//                System.err.println("For '" + list.get(index) + "': " + e.getMessage());
-//            }
-//
-//
-//            index++;
-//        }
-//        Write.close();
-//        FileWriter Writer=new FileWriter("Crawled.txt");
-//        index=0;
-//        while(index<list.size()){
-//            Writer.write(list.get(index)+"\n");
-//            index++;
-//        }
-//        Writer.close();
-//    }
-//    @Override
-//    public void run(){
-//        try {
-//            Crawling();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-//    public static void main(String[] args) throws IOException {
-//        FileReader Read;
-//        BufferedReader bufferedReader;
-//        Read=new FileReader("src/main/Intial.txt");
-//        bufferedReader = new BufferedReader(Read);
-//        String line;
-//        List<String> list=new ArrayList<String>();
-//        while ((line = bufferedReader.readLine()) != null) {
-//            list.add(line);
-//        }
-//        Read.close();
-//        //new Crawler.Crawler().Crawling();
-////        String s="https://crawler-test.com/";
-////        String c=s.substring(s.length() - 1);
-////        System.out.println(s.substring(s.length() - 1));
-//
-//    }
-//}
+
 public class Crawler implements Runnable{
     public static List<String> list,Compact,visited;
     public static List<Document> documents;
@@ -390,10 +247,6 @@ public class Crawler implements Runnable{
         	{
         		return false;
         	}
-//        Compact=new FileWriter("Compact.txt");
-//        Compact.write(comp +"\n");
-//        Compact.close();
-
 
     }
     @Override
@@ -410,6 +263,10 @@ public class Crawler implements Runnable{
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
+        Scanner sc=new Scanner(System.in);
+
+        System.out.print("Enter the number of threads... ");
+        int number_of_threads=sc.nextInt();
 
         DatabaseManager db=new indexer.DatabaseManager();
 
@@ -478,7 +335,6 @@ public class Crawler implements Runnable{
 
 
 
-        int number_of_threads=80;
         int list_size=list_c.size()/number_of_threads;
         System.out.print("list size"+list_size);
         List<Thread> Cr= new ArrayList<Thread>();
@@ -518,18 +374,6 @@ public class Crawler implements Runnable{
            System.out.println(list_visit.get(i));
        }
 
-//        for (int i=0;i<number_of_threads;i++) {
-//
-//            Thread th=new Thread(new Crawler(base,visitedIndex,listIndex,db,list_c,comp_str,list_visit,number_of_threads,documents));
-//            th.setName(Integer.toString(i));
-//            Cr.add(th);
-//
-////            C.compact_string("https://jsoup.org/cookbook/extracting-data/example-list-links");
-//
-//            th.start();
-//
-//        }
-//
         Thread th=new Thread(new Indexer(documents,db,db.retrieveURLs(true)));
         th.join();
         System.out.println("Doneeeeeeeeeeeeee");

@@ -42,23 +42,7 @@ public class Indexer implements Runnable {
         db=dbase;
         urls=urlsList;
 
-//        splitedList.add("java");
-//        splitedList.add("java");
-//        splitedList.add("java");
-//        splitedList.add("Java");
-//        splitedList.add("Java(");
-//        splitedList.add("(Threading");
-//        splitedList.add("Os(");
-//        splitedList.add("Os");
-//        splitedList.add("Lab");
-//        splitedList.add("Map");
-//        splitedList.add("Normal");
-//        splitedList.add("Threading");
-//        splitedList.add("Java");
-//        splitedList.add("java");
-//        splitedList.add("here");
-//        splitedList.add("don’t");
-//        splitedList.add("let’s");
+
 
     }
 
@@ -68,40 +52,9 @@ public class Indexer implements Runnable {
 
         List<Document> documents=new ArrayList<>();
         List<String>urls=db.retrieveURLs(true);
-//        urls.add("\"https://www.geeksforgeeks.org/java-string-trim-method-example/\"");
         Indexer indexer = new Indexer(documents,db,urls);
     }
-//        Indexer indexer = new Indexer();
-//        Document doc=indexer.requestDocument("https://en.wikipedia.org/wiki/Prison#:~:text=A%20prison%2C%20also%20known%20as,remand%20center%2C%20is%20a%20facility");  //
-//        indexer.parseDocument(doc);
-//        indexer.docProcessing();
-//        indexer.relevant();
-//
-//        //https://www.geeksforgeeks.org/map-interface-java-examples/
-//        //https://www.netflix.com/eg-en/browse/genre/7424
-//        //
-//
-//
-//        for (int i = 0; i < indexer.splitedList.size(); i++) {
-//
-//            System.out.println("\n" +indexer.splitedList.get(i) + "\n");
-//
-//        }
-//
-//        for (int i = 0; i < indexer.relevantList.size(); i++) {
-//
-//            System.out.println("\n" +indexer.relevantList.get(i) + "\n");
-//
-//        }
-//        System.out.println("\n" + indexer.relevantList.size() + "\n");
-//
-////        for (int i = 0; i < indexer.relevantList.size(); i++) {
-////
-////           indexer.db.insertDocument(indexer.splitedList.get(i), "url", Float.parseFloat(indexer.relevantList.get(i)));
-////        }
-////        System.out.println("Done");
-//
-//    }
+
 
     @Override
     public void run()
@@ -112,15 +65,11 @@ public class Indexer implements Runnable {
             parseDocument(requestDocument(urls.get(i)));
             docProcessing();
             relevant();
-            System.out.println(urls.size());
-            System.out.println(docs.size());
-            System.out.println("................");
-            System.out.println(splitedList.size());
-            System.out.println(relevantList.size());
+
 
             Element header;
             Element title;
-            System.out.println(urls.get(i));
+
 
             Connection con = Jsoup.connect(urls.get(i));
             for (int j = 0; j < relevantList.size(); j++) {
@@ -137,10 +86,7 @@ public class Indexer implements Runnable {
                     }
                     Element des= doc.select("p").first();
 
-//                    int k=(des.text()).indexOf(',');
 
-//                    Element headers = bodyEelements.select("h1");
-//
                      String str="";
 
                      if (des!=null)
@@ -238,19 +184,16 @@ public class Indexer implements Runnable {
 
         while(j<splitedList.size())
         {
-//                System.out.println("\n j= " +j + "\n");
 
             removed=false;
 
-//           System.out.println("\n size = " +splitedList.size() + "\n");
 
             for (int i = 0; i < stopwords.length; i++) {
 
                 if(stopwords[i].equals(splitedList.get(j))||splitedList.get(j).contains("’"))
                 {
-                    System.out.println("\n going to remove \n");
+
                     splitedList.remove(j);
-                    System.out.println("\n item removed \n");
                     removed=true;
                     break;
                 }
@@ -262,7 +205,6 @@ public class Indexer implements Runnable {
                 j++;
             }
 
-//                System.out.println("\n size = " +splitedList.size() + "\n");
 
         }
 
@@ -289,7 +231,7 @@ public class Indexer implements Runnable {
 
 
 
-            System.out.println("document is not empty \n");
+
 
             Element body = doc.body();
             Elements bodyEelements=body.getAllElements();
@@ -320,7 +262,6 @@ public class Indexer implements Runnable {
             elementList.addAll(spans.eachText());
 
 
-            System.out.println(definedList.size() + "\n");
 
             for (int i = 0; i < elementList.size(); i++) {
 
@@ -367,14 +308,12 @@ public class Indexer implements Runnable {
 
                 if (splitedList.get(i).equals(temp))
                 {
-//                    System.out.println("item "+splitedList.get(i) +" at i="+i+"\n");
                     frequency++;
 
                     if (j==splitedList.size())
                     {
                         break;
                     }
-//                    System.out.println("item "+splitedList.get(i) +" at i="+i+" is removed"+"\n");
                     splitedList.remove(i);
 
 
@@ -387,9 +326,7 @@ public class Indexer implements Runnable {
             }
 
 
-            System.out.println("\n size = " +splitedList.size() + "\n");
             relevantList.add(String.valueOf((frequency/normal)*100));
-            System.out.println("\n  the word "+temp+" was repeated "+String.valueOf((frequency/normal)*100)+"\n");
             frequency = 1;
             j++;
 
@@ -417,7 +354,6 @@ public class Indexer implements Runnable {
 
     public Document requestDocument(String url)
     {
-        System.out.println(url);
         try {
 
             Connection con = Jsoup.connect(url);
@@ -425,12 +361,10 @@ public class Indexer implements Runnable {
 
             if (con.response().statusCode() == 200) {
 
-                System.out.println( con.response().statusCode()+"\n");
 
                 return doc;
             }
             else {
-                System.out.println( con.response().statusCode()+"\n");
 
 
                 return null;
