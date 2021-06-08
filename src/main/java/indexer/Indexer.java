@@ -62,8 +62,15 @@ public class Indexer implements Runnable {
 
     }
 
-//    public static void main(String[] args)
-//    {
+    public static void main(String[] args)
+    {
+        DatabaseManager db=new indexer.DatabaseManager();
+
+        List<Document> documents=new ArrayList<>();
+        List<String>urls=db.retrieveURLs(true);
+//        urls.add("\"https://www.geeksforgeeks.org/java-string-trim-method-example/\"");
+        Indexer indexer = new Indexer(documents,db,urls);
+    }
 //        Indexer indexer = new Indexer();
 //        Document doc=indexer.requestDocument("https://en.wikipedia.org/wiki/Prison#:~:text=A%20prison%2C%20also%20known%20as,remand%20center%2C%20is%20a%20facility");  //
 //        indexer.parseDocument(doc);
@@ -115,9 +122,10 @@ public class Indexer implements Runnable {
             Element title;
             System.out.println(urls.get(i));
 
+            Connection con = Jsoup.connect(urls.get(i));
             for (int j = 0; j < relevantList.size(); j++) {
 
-                Connection con = Jsoup.connect(urls.get(i));
+
                 try {
                     Document doc = con.get();
                     if (doc.select("h1").size()>0) {
@@ -162,7 +170,7 @@ public class Indexer implements Runnable {
 
     String wordProcessing (String s)
     {
-        s = s.replaceAll("[0123456789(){}_+.!@#$%^&*?>–<-]","");
+        s = s.replaceAll("[0123456789(){}_+.'!@#$%^&*?>–<-]","");
         String temp = porterStemmer.stem(s.toLowerCase());
         return temp;
     }

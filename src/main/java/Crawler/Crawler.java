@@ -478,7 +478,7 @@ public class Crawler implements Runnable{
 
 
 
-        int number_of_threads=20;
+        int number_of_threads=80;
         int list_size=list_c.size()/number_of_threads;
         System.out.print("list size"+list_size);
         List<Thread> Cr= new ArrayList<Thread>();
@@ -518,7 +518,19 @@ public class Crawler implements Runnable{
            System.out.println(list_visit.get(i));
        }
 
-        Thread th=new Thread(new Indexer(documents,db,list_visit));
+//        for (int i=0;i<number_of_threads;i++) {
+//
+//            Thread th=new Thread(new Crawler(base,visitedIndex,listIndex,db,list_c,comp_str,list_visit,number_of_threads,documents));
+//            th.setName(Integer.toString(i));
+//            Cr.add(th);
+//
+////            C.compact_string("https://jsoup.org/cookbook/extracting-data/example-list-links");
+//
+//            th.start();
+//
+//        }
+//
+        Thread th=new Thread(new Indexer(documents,db,db.retrieveURLs(true)));
         th.join();
         System.out.println("Doneeeeeeeeeeeeee");
     }
